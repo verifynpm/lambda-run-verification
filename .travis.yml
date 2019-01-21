@@ -16,7 +16,7 @@ deploy:
   on:
     branch: master
   provider: lambda
-  function_name: verifynpm-get-package
+  function_name: verifynpm-run-verification
   zip: "./compiled/bundle.zip"
   region: us-east-2
   role: arn:aws:iam::541605000355:role/lambda_code_deploy
