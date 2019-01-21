@@ -3,9 +3,9 @@
     "lib": ["es6"],
     "module": "commonjs",
     "noImplicitReturns": true,
-    "outDir": "lib",
+    "outDir": "compiled",
     "sourceMap": true,
-    "target": "es6",
+    "target": "es2017",
     "declaration": true
   },
   "include": ["src"]
