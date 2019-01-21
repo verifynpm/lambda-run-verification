@@ -1,0 +1,27 @@
+language: node_js
+node_js:
+- '8.10'
+before_install:
+- if [[ `npm -v` != 6* ]]; then npm i -g npm@6; fi
+- node --version
+- npm --version
+- nvm --version
+install:
+- npm ci
+test:
+- npm t
+script:
+- npm run zip
+deploy:
+  on:
+    branch: master
+  provider: lambda
+  function_name: verifynpm-get-package
+  zip: "./compiled/bundle.zip"
+  region: us-east-2
+  role: arn:aws:iam::541605000355:role/lambda_code_deploy
+  runtime: nodejs8.10
+  handler_name: handler
+  access_key_id: AKIAJV5LJHNRUB7PBJLQ
+  secret_access_key:
+    secure: Nl69d2OB0nZARZAdrkucl/GB87qAWXF26Ie4bjERm6x3VABWOCZuGsn+Azscs7n2fZ43nl4Tg5kES6g0wCimKmHZO7I10VdMwdPkPOBjAEy3k08fCu4+tikyqfToJPMw4Eiq9NTrBFSQKWynsXgTWtrXbNehQVArxZKShQxQBqYnmkW1bFuAz/4Y2F/1no5DQwl5edLdPvZvqDCGVIvlK1EUczhzctsS4totBDZ5Kgjy7NQi35wOHDOoqn5yjF/5LuFHMyWNs1tM7kQfs9Bmb5vhTToDn9uJNDVA7tY6K634U5VzmmYsx1Xb05qERtsjdHDvb5xRfIvZMaPYRFy7jLrEYwyf6YhAh+gpGx01HzO48ThMYNCnzDwg/vsX0Q1quHxukX5OlYuLBtQov+c1sSjHi+mw0G5GXt23+WZoAwGXLoN7jCzYoy5CZM5mR9CFj/AYblGKqvkb+flvbYOuRHWoo3Z4+T8px8+6qY4tMHaPHxxTA6CXncuC7APM6wFMofq6D/F9/H8EWtT+6OZqMNTXanOM/5NUrSYolC8/FWAzrxsG4DNwMARFR2k8DBEb7bcHC5GeFKQ/9tOKETc+5FZ0Mcde/5MDaiGHse3VQb6bOrckUp26nAOhT4+M4xsMDuW3CvKlJnUrBgwcp564y9Yz0NBlE5FOWXFwn4/sD6s=
