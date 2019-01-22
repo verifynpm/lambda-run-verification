@@ -33,6 +33,6 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
-    "tbv": "0.0.3"
+    "tbv": "0.0.4"
   }
 }
