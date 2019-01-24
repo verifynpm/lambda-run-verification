@@ -1,35 +1,73 @@
 import { DynamoDBStreamHandler, AttributeValue } from 'aws-lambda';
+import * as AWS from 'aws-sdk';
 import { Verifier } from 'tbv/lib/verifier';
 
-export const handler: DynamoDBStreamHandler = async (event, context) => {
-  for (const record of event.Records) {
-    console.log('=========== RECORD ==========');
-    console.log(JSON.stringify(record.dynamodb.OldImage, null, 2));
-    console.log(JSON.stringify(record.dynamodb.NewImage, null, 2));
+import { _id as currentAlgo } from '../node_modules/tbv/package.json';
 
+export const handler: DynamoDBStreamHandler = async event => {
+  for (const record of event.Records) {
     const newItem: Item<PackageVersion> = record.dynamodb.NewImage;
 
-    if (newItem && newItem.name && newItem.version) {
-      console.log('--- verifying ---');
+    if (
+      newItem &&
+      newItem.name &&
+      newItem.version &&
+      newItem.algo &&
+      newItem.status
+    ) {
       const name = newItem.name.S;
       const version = newItem.version.S;
-      console.log({ name, version });
+      const algo = newItem.algo.S;
+      const status = newItem.status.S as PackageVersion['status'];
 
-      const verifier = new Verifier();
-      verifier.on('failure', console.error);
-      verifier.on('warning', console.error);
-      verifier.on('notice', console.log);
-      verifier.on('trace', console.log);
+      if (
+        status === 'unknown' ||
+        (algo !== currentAlgo && status !== 'verified')
+      ) {
+        await setPackage({ name, version, algo, status: 'pending' });
 
-      try {
-        const result = await verifier.verify(name, version);
-        console.log({ result });
-      } catch (err) {
-        console.error(err);
+        const verifier = new Verifier();
+
+        try {
+          const result = await verifier.verify(name, version);
+          await setPackage({
+            name,
+            version,
+            algo,
+            status: result ? 'verified' : 'unverified',
+          });
+        } catch (err) {
+          console.error(err);
+          await setPackage({ name, version, algo, status: 'error' });
+        }
       }
     }
   }
 };
+
+async function setPackage(data: PackageVersion): Promise<void> {
+  return new Promise((resolve, reject) => {
+    try {
+      const ddb = new AWS.DynamoDB({
+        region: 'us-east-2',
+        apiVersion: '2012-10-18',
+      });
+
+      const params: AWS.DynamoDB.PutItemInput = {
+        TableName: 'packages',
+        Item: {
+          name: { S: data.name },
+          version: { S: data.version },
+          algo: { S: data.algo },
+          status: { S: data.status },
+        },
+      };
+      ddb.putItem(params, err => (!!err ? reject(err) : resolve()));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
 
 type Item<T> = { [key in keyof T]?: AttributeValue };
 
@@ -37,12 +75,11 @@ export type PackageVersion = {
   name: string;
   version: string;
   algo: string;
-  status: Status;
+  status:
+    | 'unknown'
+    | 'pending'
+    | 'verified'
+    | 'unverified'
+    | 'timeout'
+    | 'error';
 };
-
-export enum Status {
-  'unknown' = 'unknown',
-  'pending' = 'pending',
-  'verified' = 'verified',
-  'unverified' = 'unverified',
-}
