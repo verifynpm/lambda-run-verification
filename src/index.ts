@@ -24,7 +24,12 @@ export const handler: DynamoDBStreamHandler = async event => {
         status === 'unknown' ||
         (algo !== currentAlgo && status !== 'verified')
       ) {
-        await setPackage({ name, version, algo, status: 'pending' });
+        await setPackage({
+          name,
+          version,
+          algo: currentAlgo,
+          status: 'pending',
+        });
 
         const verifier = new Verifier();
 
@@ -38,7 +43,12 @@ export const handler: DynamoDBStreamHandler = async event => {
           });
         } catch (err) {
           console.error(err);
-          await setPackage({ name, version, algo, status: 'error' });
+          await setPackage({
+            name,
+            version,
+            algo: currentAlgo,
+            status: 'error',
+          });
         }
       }
     }
