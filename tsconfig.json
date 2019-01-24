@@ -6,8 +6,7 @@
     "outDir": "compiled",
     "sourceMap": true,
     "target": "es2017",
-    "declaration": true,
-    "resolveJsonModule": true
+    "declaration": true
   },
   "include": ["src"]
 }
