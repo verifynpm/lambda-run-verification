@@ -33,7 +33,7 @@ export const handler: DynamoDBStreamHandler = async event => {
           await setPackage({
             name,
             version,
-            algo,
+            algo: currentAlgo,
             status: result ? 'verified' : 'unverified',
           });
         } catch (err) {
