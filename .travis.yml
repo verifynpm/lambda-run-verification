@@ -22,7 +22,8 @@ deploy:
   role: arn:aws:iam::541605000355:role/lambda_code_deploy
   runtime: nodejs8.10
   handler_name: handler
-  timeout: 120
+  timeout: 300
+  memory_size: 1024
   environment_variables:
   - "HOME=/tmp"
   access_key_id: AKIAJ4BTOVHT76JGE4BQ
