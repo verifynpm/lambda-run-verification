@@ -2,7 +2,7 @@ import { DynamoDBStreamHandler, AttributeValue } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { Verifier } from 'tbv/lib/verifier';
 
-const currentAlgo = 'tbv@0.3.2';
+const currentAlgo = 'tbv@0.3.3';
 
 export const handler: DynamoDBStreamHandler = async event => {
   for (const record of event.Records) {
