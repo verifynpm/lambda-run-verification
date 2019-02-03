@@ -34,8 +34,8 @@ export const handler: DynamoDBStreamHandler = async event => {
         const verifier = new Verifier();
         verifier.on('failure', console.error);
         verifier.on('warning', console.error);
-        // verifier.on('notice', console.log);
-        // verifier.on('trace', console.log);
+        verifier.on('notice', console.log);
+        verifier.on('trace', console.log);
 
         try {
           const result = await verifier.verify(name, version);
