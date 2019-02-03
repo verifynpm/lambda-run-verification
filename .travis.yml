@@ -20,7 +20,7 @@ deploy:
   zip: "./compiled/bundle.zip"
   region: us-east-2
   role: arn:aws:iam::541605000355:role/lambda_code_deploy
-  runtime: custom
+  runtime: arn:aws:lambda:us-east-2:541605000355:layer:Node_10_15:12
   handler_name: handler
   timeout: 300
   memory_size: 1024
